@@ -1,0 +1,21 @@
+FROM centos
+LABEL description="This is centos image"
+LABEL author="girish"
+LABEL maintainer="girish"
+RUN cd /etc/yum.repos.d/
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+RUN yum update -y && yum install git httpd -y
+ENV abc "Hello"
+COPY ./subfolder/p1 /tmp
+ADD ./subfolder/p2 /tmp
+ADD https://dev-files.blender.org/file/download/bwdp5reejwpkuh5i2oak/PHID-FILE-nui3bpuan4wdvd7yzjrs/sample.tar.gz /tmp
+RUN cd /tmp && tar -xzvf sample.tar.gz
+EXPOSE 80 443 3308
+WORKDIR /tmp
+COPY ./shellscript.bash /tmp
+RUN groupadd -r devopsuser -g 1000
+RUN useradd -d /home/devopsuser -u 1000 -m -s /bin/bash -g devopsuser devopsuser
+USER devopsuser
+ENTRYPOINT ["/tmp/shellscript.bash"]
+CMD echo "Hello World"
